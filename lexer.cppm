@@ -38,7 +38,7 @@ export class Lexer {
         return json[this->pos++]; /* Returns the current FIRST, THEN increment */
     }
 
-    auto consume_and_emplace(Token token) {
+    auto consume_and_emplace(const Token &token) {
         this->consume();
         this->tokens.emplace_back(token);
     }
@@ -46,16 +46,8 @@ export class Lexer {
     auto lex_number() -> std::size_t {
         std::string number_str;
 
-        while (true) {
-            char next;
-
-            if (this->peek().has_value()) {
-                next = this->peek().value();
-            } else {
-                break;
-            }
-
-            if (!std::isdigit(next)) {
+        while (auto next = this->peek()) {
+            if (!std::isdigit(next.value())) {
                 break;
             }
 
@@ -72,16 +64,8 @@ export class Lexer {
         assert(this->peek().has_value());
         assert(this->consume() == '"');
 
-        while (true) {
-            char next;
-
-            if (this->peek().has_value()) {
-                next = this->peek().value();
-            } else {
-                break;
-            }
-
-            if (next == '"') {
+        while (auto next = this->peek()) {
+            if (next.value() == '"') {
                 this->consume();
                 break;
             }
@@ -100,16 +84,8 @@ export class Lexer {
 
 
     auto lex() -> std::vector<Token> {
-        while (true) {
-            char next;
-
-           if (this->peek().has_value()) {
-                next = this->peek().value();
-            } else {
-                break;
-            }
-
-            switch (next) {
+        while (auto next = this->peek()) {
+            switch (next.value()) {
                 case '{':
                     this->consume_and_emplace(token::LeftBrace {});
                     break;
@@ -138,7 +114,7 @@ export class Lexer {
                     this->consume(); /* Skip white space / useless characters */
                     break;
                 default:
-                    if (std::isdigit(static_cast<unsigned char>(next))) {
+                    if (std::isdigit(static_cast<unsigned char>(next.value()))) {
                         this->tokens.emplace_back(token::Number { .number = this->lex_number() } );
                     } else {
                         panic("Unknown token");
