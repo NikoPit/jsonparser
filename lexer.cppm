@@ -10,6 +10,8 @@ import utils;
 export namespace token {
         struct LeftBrace {};
         struct RightBrace {};
+    struct LeftSquareBracket {};
+    struct RightSquareBracket {};
         struct Colon {};
     struct Comma {};
 
@@ -18,6 +20,7 @@ export namespace token {
 }
 
 using Token = std::variant<token::LeftBrace, token::RightBrace, token::Colon, token::Comma,
+    token::LeftSquareBracket, token::RightSquareBracket,
     token::Number, token::String>;
 
 export class Lexer {
@@ -116,6 +119,12 @@ export class Lexer {
                 tokens.emplace_back(token::Comma {});
             } else if (next == '"') {
                 tokens.emplace_back(token::String { .value = this->lex_string() } );
+            } else if (next == '[') {
+                this->consume();
+                tokens.emplace_back(token::LeftSquareBracket {});
+            } else if (next == ']') {
+                this->consume();
+                tokens.emplace_back(token::RightSquareBracket {});
             } else if (next == ' ' || next == '\t' || next == '\n' || next == '\r') {
                 this->consume(); /* Skip white space / useless characters */
             }else if (std::isdigit(static_cast<unsigned char>(next))) {
