@@ -38,6 +38,11 @@ export class Lexer {
         return json[this->pos++]; /* Returns the current FIRST, THEN increment */
     }
 
+    auto consume_and_emplace(Token token) {
+        this->consume();
+        this->tokens.emplace_back(token);
+    }
+
     auto lex_number() -> std::size_t {
         std::string number_str;
 
@@ -106,28 +111,22 @@ export class Lexer {
 
             switch (next) {
                 case '{':
-                    this->consume();
-                    this->tokens.emplace_back(token::LeftBrace {});
+                    this->consume_and_emplace(token::LeftBrace {});
                     break;
                 case '}':
-                    this->consume();
-                    this->tokens.emplace_back(token::RightBrace {});
+                    this->consume_and_emplace(token::RightBrace {});
                     break;
                 case ':':
-                    this->consume();
-                    this->tokens.emplace_back(token::Colon {});
+                    this->consume_and_emplace(token::Colon {});
                     break;
                 case ',':
-                    this->consume();
-                    this->tokens.emplace_back(token::Comma {});
+                    this->consume_and_emplace(token::Comma {});
                     break;
                 case '[':
-                    this->consume();
-                    this->tokens.emplace_back(token::LeftSquareBracket {});
+                    this->consume_and_emplace(token::LeftSquareBracket {});
                     break;
                 case ']':
-                    this->consume();
-                    this->tokens.emplace_back(token::RightSquareBracket {});
+                    this->consume_and_emplace(token::RightSquareBracket {});
                     break;
                 case '"':
                     this->tokens.emplace_back(token::String { .value = this->lex_string() } );
