@@ -26,6 +26,7 @@ using Token = std::variant<token::LeftBrace, token::RightBrace, token::Colon, to
 export class Lexer {
     private:
     std::string json;
+    std::vector<Token> tokens;
     std::size_t pos;
 
     auto peek() -> std::optional<char> {
@@ -94,8 +95,6 @@ export class Lexer {
 
 
     auto lex() -> std::vector<Token> {
-        auto tokens = std::vector<Token>();
-
         while (true) {
             char next;
 
@@ -108,30 +107,30 @@ export class Lexer {
             switch (next) {
                 case '{':
                     this->consume();
-                    tokens.emplace_back(token::LeftBrace {});
+                    this->tokens.emplace_back(token::LeftBrace {});
                     break;
                 case '}':
                     this->consume();
-                    tokens.emplace_back(token::RightBrace {});
+                    this->tokens.emplace_back(token::RightBrace {});
                     break;
                 case ':':
                     this->consume();
-                    tokens.emplace_back(token::Colon {});
+                    this->tokens.emplace_back(token::Colon {});
                     break;
                 case ',':
                     this->consume();
-                    tokens.emplace_back(token::Comma {});
+                    this->tokens.emplace_back(token::Comma {});
                     break;
                 case '[':
                     this->consume();
-                    tokens.emplace_back(token::LeftSquareBracket {});
+                    this->tokens.emplace_back(token::LeftSquareBracket {});
                     break;
                 case ']':
                     this->consume();
-                    tokens.emplace_back(token::RightSquareBracket {});
+                    this->tokens.emplace_back(token::RightSquareBracket {});
                     break;
                 case '"':
-                    tokens.emplace_back(token::String { .value = this->lex_string() } );
+                    this->tokens.emplace_back(token::String { .value = this->lex_string() } );
                     break;
                 case ' ':
                 case '\t':
@@ -141,13 +140,13 @@ export class Lexer {
                     break;
                 default:
                     if (std::isdigit(static_cast<unsigned char>(next))) {
-                        tokens.emplace_back(token::Number { .number = this->lex_number() } );
+                        this->tokens.emplace_back(token::Number { .number = this->lex_number() } );
                     } else {
                         panic("Unknown token");
                     }
             }
         }
 
-        return tokens;
+        return this->tokens;
     }
 };
