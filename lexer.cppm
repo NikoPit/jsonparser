@@ -11,12 +11,13 @@ export namespace token {
         struct LeftBrace {};
         struct RightBrace {};
         struct Colon {};
+    struct Comma {};
 
         struct Number { std::size_t number; };
         struct String { std::string value; };
 }
 
-using Token = std::variant<token::LeftBrace, token::RightBrace, token::Colon,
+using Token = std::variant<token::LeftBrace, token::RightBrace, token::Colon, token::Comma,
     token::Number, token::String>;
 
 export class Lexer {
@@ -110,6 +111,9 @@ export class Lexer {
             } else if (next == ':') {
                 this->consume();
                 tokens.emplace_back(token::Colon {});
+            } else if (next == ',') {
+                this->consume();
+                tokens.emplace_back(token::Comma {});
             } else if (next == '"') {
                 tokens.emplace_back(token::String { .value = this->lex_string() } );
             } else if (next == ' ' || next == '\t' || next == '\n' || next == '\r') {
