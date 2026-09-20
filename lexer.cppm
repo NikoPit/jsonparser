@@ -105,32 +105,46 @@ export class Lexer {
                 break;
             }
 
-            if (next == '{') {
-                this->consume();
-                tokens.emplace_back(token::LeftBrace {});
-            } else if (next == '}') {
-                this->consume();
-                tokens.emplace_back(token::RightBrace {});
-            } else if (next == ':') {
-                this->consume();
-                tokens.emplace_back(token::Colon {});
-            } else if (next == ',') {
-                this->consume();
-                tokens.emplace_back(token::Comma {});
-            } else if (next == '"') {
-                tokens.emplace_back(token::String { .value = this->lex_string() } );
-            } else if (next == '[') {
-                this->consume();
-                tokens.emplace_back(token::LeftSquareBracket {});
-            } else if (next == ']') {
-                this->consume();
-                tokens.emplace_back(token::RightSquareBracket {});
-            } else if (next == ' ' || next == '\t' || next == '\n' || next == '\r') {
-                this->consume(); /* Skip white space / useless characters */
-            }else if (std::isdigit(static_cast<unsigned char>(next))) {
-                tokens.emplace_back(token::Number { .number = this->lex_number() } );
-            } else {
-                panic("Unknown token");
+            switch (next) {
+                case '{':
+                    this->consume();
+                    tokens.emplace_back(token::LeftBrace {});
+                    break;
+                case '}':
+                    this->consume();
+                    tokens.emplace_back(token::RightBrace {});
+                    break;
+                case ':':
+                    this->consume();
+                    tokens.emplace_back(token::Colon {});
+                    break;
+                case ',':
+                    this->consume();
+                    tokens.emplace_back(token::Comma {});
+                    break;
+                case '[':
+                    this->consume();
+                    tokens.emplace_back(token::LeftSquareBracket {});
+                    break;
+                case ']':
+                    this->consume();
+                    tokens.emplace_back(token::RightSquareBracket {});
+                    break;
+                case '"':
+                    tokens.emplace_back(token::String { .value = this->lex_string() } );
+                    break;
+                case ' ':
+                case '\t':
+                case '\n':
+                case '\r':
+                    this->consume(); /* Skip white space / useless characters */
+                    break;
+                default:
+                    if (std::isdigit(static_cast<unsigned char>(next))) {
+                        tokens.emplace_back(token::Number { .number = this->lex_number() } );
+                    } else {
+                        panic("Unknown token");
+                    }
             }
         }
 
